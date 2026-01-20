@@ -17,7 +17,7 @@ import base64
 
 st.set_page_config(
     page_title="AirSight Systems | Mission Control",
-    page_icon="🛰️",
+    page_icon="🌐",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -738,6 +738,88 @@ with st.sidebar:
     st.markdown("---")
     auto_refresh = st.checkbox("Auto-Refresh (2s)", value=True)
     
+    # CONTROL PANEL
+    st.markdown("---")
+    st.markdown("#### 🎛️ EMISSION CONTROL")
+    
+    # Get control state from backend
+    try:
+        import requests
+        control_response = requests.get("http://localhost:5000/api/control/state", timeout=1)
+        control_state = control_response.json()
+    except:
+        control_state = {
+            "exhaust_fan": False,
+            "filtration_unit": False,
+            "ventilation": False,
+            "emergency_shutdown": False,
+            "auto_mode": True
+        }
+    
+    # Auto mode toggle
+    auto_mode = st.checkbox("🤖 Automatic Mode", value=control_state.get("auto_mode", True))
+    if auto_mode != control_state.get("auto_mode"):
+        try:
+            requests.post("http://localhost:5000/api/control/set", 
+                         json={"device": "auto_mode", "state": auto_mode, "reason": "User toggle"}, 
+                         timeout=1)
+        except:
+            pass
+    
+    st.markdown("<small style='color: #888;'>Manual Controls:</small>", unsafe_allow_html=True)
+    
+    # Control buttons
+    col_c1, col_c2 = st.columns(2)
+    
+    with col_c1:
+        fan_state = control_state.get("exhaust_fan", False)
+        fan_label = "🌪️ FAN ON" if fan_state else "🌪️ FAN OFF"
+        fan_type = "primary" if fan_state else "secondary"
+        if st.button(fan_label, use_container_width=True, type=fan_type, disabled=auto_mode):
+            try:
+                requests.post("http://localhost:5000/api/control/set",
+                            json={"device": "exhaust_fan", "state": not fan_state, "reason": "Manual control"},
+                            timeout=1)
+                st.rerun()
+            except:
+                pass
+    
+    with col_c2:
+        filter_state = control_state.get("filtration_unit", False)
+        filter_label = "🔧 FILTER ON" if filter_state else "🔧 FILTER OFF"
+        filter_type = "primary" if filter_state else "secondary"
+        if st.button(filter_label, use_container_width=True, type=filter_type, disabled=auto_mode):
+            try:
+                requests.post("http://localhost:5000/api/control/set",
+                            json={"device": "filtration_unit", "state": not filter_state, "reason": "Manual control"},
+                            timeout=1)
+                st.rerun()
+            except:
+                pass
+    
+    vent_state = control_state.get("ventilation", False)
+    vent_label = "💨 VENTILATION ON" if vent_state else "💨 VENTILATION OFF"
+    vent_type = "primary" if vent_state else "secondary"
+    if st.button(vent_label, use_container_width=True, type=vent_type, disabled=auto_mode):
+        try:
+            requests.post("http://localhost:5000/api/control/set",
+                        json={"device": "ventilation", "state": not vent_state, "reason": "Manual control"},
+                        timeout=1)
+            st.rerun()
+        except:
+            pass
+    
+    # Emergency shutdown
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🚨 EMERGENCY SHUTDOWN", use_container_width=True, type="secondary"):
+        try:
+            requests.post("http://localhost:5000/api/control/set",
+                        json={"device": "emergency_shutdown", "state": True, "reason": "Emergency shutdown activated"},
+                        timeout=1)
+            st.rerun()
+        except:
+            pass
+    
     st.markdown("---")
     st.markdown(
         """
@@ -810,6 +892,19 @@ with placeholder.container():
         # PM2.5 (Dust)
         dust_val = latest.get('dust', 0)
         dust_status, dust_color, dust_icon = get_safety_status(dust_val, 'dust')
+        
+        # Temperature
+        temp_val = latest.get('temp', 0)
+        temp_status, temp_color, temp_icon = get_safety_status(temp_val, 'temp')
+        
+        # TVOC
+        tvoc_val = latest.get('tvoc', 0)
+        tvoc_status, tvoc_color, tvoc_icon = get_safety_status(tvoc_val, 'tvoc')
+        
+        # eCO2
+        eco2_val = latest.get('eco2', 0)
+        eco2_status, eco2_color, eco2_icon = get_safety_status(eco2_val, 'eco2')
+        
         with col1:
             st.markdown(
                 f"""
@@ -819,21 +914,39 @@ with placeholder.container():
                         {dust_val:.2f} <span class='metric-unit'>µg/m³</span>
                     </div>
                 </div>
+                """,
+                unsafe_allow_html=True
+            )
 
+        with col2:
+            st.markdown(
+                f"""
                 <div class='glass-card kpi-{temp_status}'>
                     <div class='metric-label'>{temp_icon} Temperature</div>
                     <div class='metric-value' style='color: {temp_color};'>
                         {temp_val:.1f} <span class='metric-unit'>°C</span>
                     </div>
                 </div>
+                """,
+                unsafe_allow_html=True
+            )
 
+        with col3:
+            st.markdown(
+                f"""
                 <div class='glass-card kpi-{tvoc_status}'>
                     <div class='metric-label'>{tvoc_icon} TVOC</div>
                     <div class='metric-value' style='color: {tvoc_color};'>
                         {tvoc_val} <span class='metric-unit'>ppb</span>
                     </div>
                 </div>
+                """,
+                unsafe_allow_html=True
+            )
 
+        with col4:
+            st.markdown(
+                f"""
                 <div class='glass-card kpi-{eco2_status}'>
                     <div class='metric-label'>{eco2_icon} eCO₂</div>
                     <div class='metric-value' style='color: {eco2_color};'>
@@ -847,7 +960,114 @@ with placeholder.container():
         st.markdown("<br>", unsafe_allow_html=True)
         
         
+        # AUTOMATED CONTROL LOGIC
+        try:
+            import requests
+            control_response = requests.get("http://localhost:5000/api/control/state", timeout=1)
+            control_state = control_response.json()
+            
+            if control_state.get("auto_mode", True):
+                # Automatic threshold-based control
+                actions_taken = []
+                
+                # High dust -> activate filtration
+                if dust_val > 1000 and not control_state.get("filtration_unit"):
+                    requests.post("http://localhost:5000/api/control/set",
+                                json={"device": "filtration_unit", "state": True, 
+                                     "reason": f"Auto: Dust level {dust_val:.1f} > 1000 µg/m³"},
+                                timeout=1)
+                    actions_taken.append("🔧 Filtration Unit ACTIVATED")
+                
+                # High TVOC -> activate ventilation
+                if tvoc_val > 500 and not control_state.get("ventilation"):
+                    requests.post("http://localhost:5000/api/control/set",
+                                json={"device": "ventilation", "state": True,
+                                     "reason": f"Auto: TVOC {tvoc_val} > 500 ppb"},
+                                timeout=1)
+                    actions_taken.append("💨 Ventilation ACTIVATED")
+                
+                # High eCO2 -> activate exhaust fan
+                if eco2_val > 1200 and not control_state.get("exhaust_fan"):
+                    requests.post("http://localhost:5000/api/control/set",
+                                json={"device": "exhaust_fan", "state": True,
+                                     "reason": f"Auto: eCO₂ {eco2_val} > 1200 ppm"},
+                                timeout=1)
+                    actions_taken.append("🌪️ Exhaust Fan ACTIVATED")
+                
+                # Show control actions if any
+                if actions_taken:
+                    st.markdown("### 🤖 AUTOMATED CONTROL ACTIONS")
+                    for action in actions_taken:
+                        st.success(action)
+                    st.markdown("<br>", unsafe_allow_html=True)
+        except:
+            pass
+        
+        
         # VISUALIZATION LAYER
+        
+        
+        # CONTROL SYSTEM STATUS DISPLAY
+        st.markdown("### 🎛️ EMISSION CONTROL STATUS")
+        
+        try:
+            import requests
+            control_response = requests.get("http://localhost:5000/api/control/state", timeout=1)
+            ctrl = control_response.json()
+            
+            ctrl_col1, ctrl_col2, ctrl_col3, ctrl_col4 = st.columns(4)
+            
+            with ctrl_col1:
+                fan_status = "🟢 ACTIVE" if ctrl.get("exhaust_fan") else "⚫ STANDBY"
+                fan_color = "#00FF94" if ctrl.get("exhaust_fan") else "#6B6B6B"
+                st.markdown(f"""
+                <div class='glass-card'>
+                    <div class='metric-label'>🌪️ Exhaust Fan</div>
+                    <div class='metric-value' style='color: {fan_color}; font-size: 1.2rem;'>
+                        {fan_status}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with ctrl_col2:
+                filter_status = "🟢 ACTIVE" if ctrl.get("filtration_unit") else "⚫ STANDBY"
+                filter_color = "#00FF94" if ctrl.get("filtration_unit") else "#6B6B6B"
+                st.markdown(f"""
+                <div class='glass-card'>
+                    <div class='metric-label'>🔧 Filtration Unit</div>
+                    <div class='metric-value' style='color: {filter_color}; font-size: 1.2rem;'>
+                        {filter_status}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with ctrl_col3:
+                vent_status = "🟢 ACTIVE" if ctrl.get("ventilation") else "⚫ STANDBY"
+                vent_color = "#00FF94" if ctrl.get("ventilation") else "#6B6B6B"
+                st.markdown(f"""
+                <div class='glass-card'>
+                    <div class='metric-label'>💨 Ventilation</div>
+                    <div class='metric-value' style='color: {vent_color}; font-size: 1.2rem;'>
+                        {vent_status}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with ctrl_col4:
+                mode = "🤖 AUTO" if ctrl.get("auto_mode") else "👤 MANUAL"
+                mode_color = "#FFD700" if ctrl.get("auto_mode") else "#FF6B6B"
+                st.markdown(f"""
+                <div class='glass-card'>
+                    <div class='metric-label'>⚙️ Control Mode</div>
+                    <div class='metric-value' style='color: {mode_color}; font-size: 1.2rem;'>
+                        {mode}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+        except:
+            st.info("🔌 Control system initializing...")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         
         
         st.markdown("### 📈 EMISSION TRENDS")

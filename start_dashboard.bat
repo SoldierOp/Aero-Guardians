@@ -12,4 +12,4 @@ echo.
 echo Press Ctrl+C to stop
 echo.
 
-streamlit run sensor_dashboard.py
+python -m streamlit run airsight_dashboard.py

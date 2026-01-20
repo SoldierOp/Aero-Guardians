@@ -269,6 +269,74 @@ def get_latest_sensor():
         return jsonify({"error": str(e)}), 500
 
 
+# CONTROL SYSTEM ENDPOINTS
+
+control_state = {
+    "exhaust_fan": False,
+    "filtration_unit": False,
+    "ventilation": False,
+    "emergency_shutdown": False,
+    "auto_mode": True,
+    "last_updated": None
+}
+
+@app.route("/api/control/state", methods=["GET"])
+def get_control_state():
+    """Get current control system state."""
+    return jsonify(control_state)
+
+
+@app.route("/api/control/set", methods=["POST"])
+def set_control():
+    """Set control system state."""
+    try:
+        data = request.get_json()
+        device = data.get("device")
+        state = data.get("state")
+        
+        if device in control_state:
+            control_state[device] = state
+            control_state["last_updated"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            
+            # Log control action
+            log_control_action(device, state, data.get("reason", "Manual override"))
+            
+            return jsonify({"success": True, "control_state": control_state})
+        else:
+            return jsonify({"error": "Invalid device"}), 400
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+def log_control_action(device, state, reason):
+    """Log all control actions to CSV."""
+    action = {
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "device": device,
+        "state": "ON" if state else "OFF",
+        "reason": reason
+    }
+    
+    df = pd.DataFrame([action])
+    file_path = os.path.join("data", "control_log.csv")
+    header = not os.path.exists(file_path)
+    df.to_csv(file_path, mode="a", header=header, index=False)
+
+
+@app.route("/api/control/history", methods=["GET"])
+def get_control_history():
+    """Get control action history."""
+    try:
+        file_path = os.path.join("data", "control_log.csv")
+        if os.path.exists(file_path):
+            df = pd.read_csv(file_path)
+            return jsonify(df.tail(50).to_dict(orient="records"))
+        else:
+            return jsonify([])
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000, debug=True)
