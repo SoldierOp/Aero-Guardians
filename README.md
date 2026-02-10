@@ -1,53 +1,59 @@
 # 🌊 PeatGuard - Professional Peatland Fire & Flood Monitoring System
 
-> **🏆 HACKATHON READY | SOFTWARE PRODUCTION READY | HARDWARE ARRIVES MONDAY**
+> **🏆 PRODUCTION READY | IoT + AI + WhatsApp Integration**
 
-**Dual-hazard monitoring system with 8 professional sensors, WhatsApp alerts, and offline-first architecture.**  
-*From 2015's $16B disaster to 2026's life-saving community protection.*
+**Dual-hazard monitoring system with 8 professional sensors, TinyML edge AI, WhatsApp alerts, and real-time dashboard.**  
+*Protecting Indonesian peatland communities from fires and floods.*
 
 ---
 
-## 🚀 **QUICK STATUS** (Updated: Feb 6, 2026)
+## 🚀 **SYSTEM STATUS** (Updated: Feb 10, 2026)
 
-| Component | Status | Notes |
+| Component | Status | Details |
 |-----------|--------|-------|
-| 🖥️ Backend API | ✅ **READY** | FastAPI + PostgreSQL + MQTT + WhatsApp (tested!) |
-| 🎨 Dashboard | ✅ **READY** | Beautiful peatland theme, all 8 sensors displayed |
-| 🧠 Edge AI | ✅ **TRAINED** | TinyML fire prediction model (6.53 KB) |
-| 📱 WhatsApp | ✅ **TESTED** | Message delivered to +919306912663 |
-| 🔧 Firmware | ✅ **READY** | Production code for 8 sensors + I2C Hub |
-| 📦 Hardware | 📬 **MONDAY** | $90 professional sensors arriving Monday |
-| 🏆 Competition | 🗓️ **FRIDAY** | **WIN!** |
+| 🖥️ **Backend API** | ✅ **READY** | FastAPI + MQTT + PostgreSQL + WhatsApp integration |
+| 🎨 **Dashboard** | ✅ **READY** | Streamlit real-time monitoring with peatland theme |
+| 🧠 **Edge AI** | ✅ **TRAINED** | TinyML fire prediction model (6.53 KB TFLite) |
+| 📱 **WhatsApp Alerts** | ✅ **TESTED** | Twilio integration with demo scripts |
+| 🔧 **Firmware** | ✅ **READY** | ESP32 production code for 8 sensors |
+| 🧪 **Testing Scripts** | ✅ **COMPLETE** | Backend, WhatsApp, chatbot, and webhook tests |
+| 📊 **ML Models** | ✅ **DEPLOYED** | H5, TFLite, and C header files ready |
 
 ---
 
-## 🎬 **IF YOU JUST GOT HARDWARE (It's Monday!)**
+## 🚀 **QUICK START**
 
-**👉 START HERE:** [docs/strategy/MONDAY_SETUP_GUIDE.md](docs/strategy/MONDAY_SETUP_GUIDE.md)
+### Option 1: Backend + Dashboard
 
-**8-hour setup plan:**
-1. 🔧 Assemble hardware (2-3 hours)
-2. 💾 Flash firmware (1 hour)
-3. 🎯 Calibrate sensors (1 hour)
-4. 🌐 System integration test (2 hours)
-5. 🧪 End-to-end WhatsApp test (1 hour)
+**Windows:**
+```cmd
+REM Start backend (Terminal 1)
+start_backend.bat
 
-**Goal:** Working system by 5 PM ✅
+REM Start dashboard (Terminal 2)
+start_dashboard.bat
+```
 
----
+**Linux/Mac:**
+```bash
+# Start backend (Terminal 1)
+python backend_api.py
 
-## 📚 **KEY DOCUMENTS**
+# Start dashboard (Terminal 2)
+streamlit run dashboard.py
+```
 
-**For Hardware Setup:**
-- 📘 [MONDAY_SETUP_GUIDE.md](docs/strategy/MONDAY_SETUP_GUIDE.md) - Quick reference guide
-- 📗 [COMPLETE_HARDWARE_SPEC.md](docs/hardware/COMPLETE_HARDWARE_SPEC.md) - All 8 sensors, BOM, specs
+**Access:**
+- Dashboard: http://localhost:8501
+- API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
 
-**For Competition:**
-- 🏆 [ULTIMATE_WINNING_STRATEGY.md](docs/strategy/ULTIMATE_WINNING_STRATEGY.md) - 5-min pitch, Q&A prep, 99/100 score
-- ✅ [HACKATHON_VICTORY_CHECKLIST.md](docs/strategy/HACKATHON_VICTORY_CHECKLIST.md) - Day-by-day plan
+### Option 2: Test WhatsApp Integration
 
-**All Documentation:**
-- 📁 [docs/](docs/) - Complete documentation library
+```bash
+cd scripts
+python test_whatsapp.py
+```
 
 ---
 
@@ -206,6 +212,192 @@ Built with FastAPI + lightweight frontend:
 - 🔋 **Solar panel + battery** (field deployment)
 - 📦 **Weatherproof enclosure** for harsh peat environments
 - 🛠️ **Field-maintainable** by local technicians
+
+---
+
+---
+
+## 🛠️ Configuration
+
+### Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+# Twilio Configuration (WhatsApp)
+TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
+RECIPIENT_WHATSAPP_NUMBER=whatsapp:+919306912663
+
+# Database Configuration
+DATABASE_URL=postgresql://user:password@localhost:5432/peatguard
+
+# API Configuration
+API_HOST=0.0.0.0
+API_PORT=8000
+DEBUG=True
+
+# MQTT Configuration
+MQTT_BROKER=localhost
+MQTT_PORT=1883
+MQTT_TOPIC=peatguard/sensors
+```
+
+### WiFi Configuration (ESP32)
+
+Edit `peatguard_pro_firmware.ino`:
+
+```cpp
+const char* ssid = "YOUR_WIFI_NAME";
+const char* password = "YOUR_WIFI_PASSWORD";
+const char* serverIP = "192.168.1.XXX";  // Your computer's IP
+```
+
+---
+
+## 📡 API Endpoints
+
+The FastAPI backend (`backend_api.py`) provides:
+
+### Sensor Data
+- `POST /api/sensor-data` - Receive sensor readings from ESP32
+- `GET /api/sensor-data` - Retrieve historical sensor data
+- `GET /api/sensor-data/latest` - Get latest sensor reading
+
+### Alerts & Control
+- `GET /api/alerts` - Retrieve alert history
+- `POST /api/alerts` - Create new alert
+- `GET /api/control/status` - Get control device states
+
+### WhatsAppChat
+- `POST /api/webhook/whatsapp` - Twilio webhook for incoming messages
+- `POST /api/send-alert` - Send WhatsApp alert manually
+
+### Health Check
+- `GET /health` - API health status
+- `GET /docs` - OpenAPI documentation (Swagger UI)
+
+---
+
+## 🎨 Dashboard Features
+
+The Streamlit dashboard ([dashboard.py](dashboard.py)) provides:
+
+### Real-Time Monitoring
+- 📊 **KPI Cards** - Live sensor values with color-coded status
+- 📈 **Trend Charts** - Historical data visualization
+- 🚦 **Risk Indicators** - Fire risk, flood risk, water quality
+
+### Alert Management
+- 📱 **WhatsApp Integration** - Send alerts to configured numbers
+- 🔔 **Alert History** - View past alerts and responses
+- ⚙️ **Threshold Configuration** - Customize alert triggers
+
+### Data Export
+- 📥 **CSV Export** - Download sensor data
+- 📄 **PDF Reports** - Generate summary reports
+- 📊 **Analytics Dashboard** - Trends and insights
+
+---
+
+## 🤖 TinyML Fire Prediction
+
+The system includes an edge AI model for fire risk prediction:
+
+### Model Architecture
+- **Input:** 6 features (PM1.0, PM2.5, PM10, VOC, Temperature, Humidity)
+- **Output:** Fire risk score (0-1)
+- **Size:** 6.53 KB (TFLite optimized)
+- **Inference:** On-device (ESP32)
+
+### Training
+```bash
+cd scripts
+python train_fire_prediction_model.py
+```
+
+Generated files:
+- `models/fire_prediction_model.h5` - Keras model
+- `models/fire_prediction_model.tflite` - TFLite model
+- `models/fire_prediction_model_data.h` - C header for ESP32
+
+---
+
+## 📱 WhatsApp Integration
+
+### Setup
+
+1. **Create Twilio Account** - Get account SID and auth token
+2. **Enable WhatsApp Sandbox** - Follow Twilio WhatsApp setup
+3. **Configure .env** - Add credentials
+4. **Test Integration:**
+   ```bash
+   cd scripts
+   python test_whatsapp.py
+   ```
+
+### Message Format
+
+**Fire Alert:**
+```
+🔥 PERINGATAN KEBAKARAN GAMBUT!
+
+Lokasi: Sungai Tohor
+Waktu: 2026-02-10 14:30
+
+🌡️ Suhu: 35°C
+💨 VOC: 850 ppb
+🌫️ PM2.5: 75 µg/m³
+
+⚠️ Risiko tinggi! Periksa area segera.
+```
+
+**Flood Alert:**
+```
+🌊 PERINGATAN BANJIR!
+
+Lokasi: Sungai Tohor
+Waktu: 2026-02-10 15:45
+
+📏 Ketinggian Air: 2.5m (+0.5m)
+🧂 Salinitas: 1200 ppm
+
+⚠️ Air naik cepat! Evakuasi jika perlu.
+```
+
+---
+
+## 🧪 Testing
+
+### Backend API Tests
+```bash
+cd scripts
+python test_backend.py
+```
+
+Tests:
+- Health check endpoint
+- Sensor data submission
+- Data retrieval
+- Alert creation
+- WhatsApp webhook
+
+### WhatsApp Integration Test
+```bash
+cd scripts
+python test_whatsapp.py
+```
+
+Sends a test message to configured WhatsApp number.
+
+### Demo Data Injection
+```bash
+cd scripts
+python inject_demo_data.py
+```
+
+Populates the database with sample sensor readings for testing.
 
 ---
 
@@ -399,17 +591,17 @@ cd aero-guardians
 
 #### Step 2: Install Python Dependencies
 
-**Windows:**
-```cmd
+```bash
 pip install -r requirements.txt
 ```
 
-**Linux/Mac:**
-```bash
-pip3 install -r requirements.txt
-```
-
-This installs: Flask, Streamlit, Pandas, Plotly, ReportLab, Kaleido
+**Key Dependencies:**
+- FastAPI + Uvicorn (backend server)
+- Streamlit (dashboard)
+- Twilio (WhatsApp integration)
+- TensorFlow (ML model training)
+- Paho-MQTT (IoT communication)
+- psycopg2 (PostgreSQL database)
 
 ---
 
@@ -428,7 +620,7 @@ This installs: Flask, Streamlit, Pandas, Plotly, ReportLab, Kaleido
    - Install: `Adafruit SSD1306`, `Adafruit GFX`, `Adafruit SGP30`, `Adafruit MCP9808`
 
 4. **Open the Firmware:**
-   - File → Open → `esp32_sensor_code.ino`
+   - File → Open → `peatguard_pro_firmware.ino`
 
 5. **Configure WiFi Credentials:**
    ```cpp
@@ -474,17 +666,18 @@ start_backend.bat
 
 **Linux/Mac:**
 ```bash
-python3 app.py
+python backend_api.py
 ```
 
 **Expected Output:**
 ```
- * Running on http://0.0.0.0:5000
- * Running on http://192.168.1.100:5000
-Press CTRL+C to quit
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process
+INFO:     Started server process
+INFO:     Application startup complete.
 ```
 
-✅ Backend is now running on port 5000
+✅ Backend API is now running on port 8000
 
 ---
 
@@ -500,7 +693,7 @@ start_dashboard.bat
 
 **Linux/Mac:**
 ```bash
-streamlit run airsight_dashboard.py --server.port 8501
+streamlit run dashboard.py
 ```
 
 **Expected Output:**
@@ -538,66 +731,88 @@ Your AeroGuardians system is now operational:
 
 ---
 
-### 🧪 Testing Without Hardware
+### 🧪 Testing Scripts
 
-If you don't have the physical sensors yet, you can test with simulated data:
+**Test Backend API:**
+```bash
+cd scripts
+python test_backend.py
+```
 
-1. Run backend: `python app.py`
-2. Use the test script:
-   ```bash
-   python test_api.py
-   ```
-   This sends sample sensor data to the backend
-3. Open dashboard and see the simulated data
+**Test WhatsApp Integration:**
+```bash
+cd scripts
+python test_whatsapp.py
+```
+
+**Test Chatbot:**
+```bash
+cd scripts
+python test_chatbot.py
+```
+
+**Inject Demo Data:**
+```bash
+cd scripts
+python inject_demo_data.py
+```
+
+**Check Twilio Status:**
+```bash
+cd scripts
+python check_twilio_status.py
+```
 
 ---
 
 ## 📁 Project Structure
 
 ```
-peatguard/
+aero-guardians-master/
 ├── 📄 Core Application Files
 │   ├── backend_api.py              # FastAPI backend with MQTT & WhatsApp
-│   ├── dashboard.py                # Streamlit dashboard (peatland theme)
-│   ├── peatguard_pro_firmware.ino  # Production ESP32 firmware (8 sensors)
+│   ├── dashboard.py                # Streamlit real-time dashboard
+│   ├── peatguard_pro_firmware.ino  # ESP32 firmware (8 sensors)
 │   ├── requirements.txt            # Python dependencies
-│   ├── .env                        # Environment config (Twilio, DB)
+│   ├── README.md                   # This file
+│   ├── .env                        # Environment variables (not in repo)
 │   ├── start_backend.bat          # Windows backend launcher
-│   └── start_dashboard.bat        # Windows dashboard launcher
+│   ├── start_dashboard.bat        # Windows dashboard launcher
+│   ├── NGROK_SETUP.md             # Ngrok webhook setup guide
+│   ├── download_ngrok.ps1         # Ngrok download script
+│   └── get_ngrok.ps1              # Ngrok setup script
 │
-├── 📁 models/                      # TinyML Edge AI models
-│   ├── fire_prediction_model.h5    # Keras model (training)
+├── 📁 models/                      # TinyML Edge AI Models
+│   ├── fire_prediction_model.h5    # Keras model (140 KB)
 │   ├── fire_prediction_model.tflite # TFLite model (6.53 KB)
 │   ├── fire_prediction_model_data.h # C header for ESP32
 │   ├── scaler_params.h             # Preprocessing parameters
+│   ├── scaler.pkl                  # Scikit-learn scaler
 │   └── README.md                   # Model documentation
 │
-├── 📁 scripts/                     # Utility scripts
+├── 📁 scripts/                     # Testing & Utility Scripts
 │   ├── train_fire_prediction_model.py # Train TinyML model
-│   ├── test_api.py                 # Backend API tests
-│   ├── test_whatsapp.py            # WhatsApp integration test
-│   ├── check_twilio_status.py      # Message delivery checker
+│   ├── test_backend.py             # Backend API integration tests
+│   ├── test_whatsapp.py            # WhatsApp messaging test
+│   ├── test_chatbot.py             # Chatbot functionality test
+│   ├── test_webhook.py             # Webhook endpoint test
+│   ├── demo_whatsapp.py            # WhatsApp demo script
+│   ├── start_whatsapp_test.py      # WhatsApp test runner
+│   ├── inject_demo_data.py         # Inject sample sensor data
+│   ├── check_twilio_status.py      # Verify Twilio message delivery
 │   └── README.md                   # Scripts documentation
 │
-├── 📁 data/                        # Runtime data storage
+├── 📁 data/                        # Runtime Data Storage
 │   ├── sensor_log.csv              # Historical sensor readings
 │   ├── control_log.csv             # Alert/control actions
-│   └── realtime_log.csv            # Live data buffer
+│   ├── realtime_log.csv            # Live data buffer
+│   └── .gitkeep                    # Keep empty directory in git
 │
-├── 📁 docs/                        # Documentation
-│   ├── README.md                   # Documentation index
-│   ├── PROJECT_OVERVIEW.md         # Project summary
-│   ├── SETUP_GUIDE.md              # Software setup guide
-│   │
-│   ├── 📁 hardware/                # Hardware documentation
-│   │   ├── COMPLETE_HARDWARE_SPEC.md # All sensors, BOM, specs
-│   │   ├── HARDWARE_GUIDE.md        # Assembly instructions
-│   │   ├── peatguard_firmware.ino   # Old firmware (reference)
-│   │   └── peatsense_firmware.ino   # Old firmware (reference)
-│   │
-│   └── 📁 strategy/                # Competition strategy
-│       ├── ULTIMATE_WINNING_STRATEGY.md  # 99/100 score playbook
-│       ├── HACKATHON_VICTORY_CHECKLIST.md # Day-by-day plan
+└── 📁 test_connected_sensors/      # Hardware Testing
+    └── test_connected_sensors.ino  # Sensor connection test code
+```
+
+**Note:** The `docs/` folder contains extensive documentation but is not included in the GitHub repository.
 │       ├── MONDAY_SETUP_GUIDE.md    # Hardware setup (8 hours)
 │       └── WINNING_STRATEGY.md      # Initial strategy document
 │
