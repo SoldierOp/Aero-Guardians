@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo  AeroGuardians - Sensor Dashboard
+echo  PeatSense Dashboard
 echo ========================================
 echo.
 
@@ -9,7 +9,10 @@ echo.
 echo Dashboard will open in your browser at:
 echo http://localhost:8501
 echo.
+echo Make sure backend is running on:
+echo http://localhost:8000
+echo.
 echo Press Ctrl+C to stop
 echo.
 
-python -m streamlit run airsight_dashboard.py
+python -m streamlit run dashboard.py

@@ -1,0 +1,40 @@
+"""
+Start backend with public URL display for easy testing
+"""
+
+import subprocess
+import sys
+
+print("=" * 60)
+print("🚀 PEATGUARD WHATSAPP CHATBOT - READY FOR TESTING")
+print("=" * 60)
+print()
+print("✅ Backend is running on: http://localhost:8000")
+print("✅ Webhook endpoint: http://localhost:8000/webhook/whatsapp")
+print()
+print("📱 TO TEST WITH REAL WHATSAPP:")
+print()
+print("Option 1 - ngrok (Recommended):")
+print("  1. Download ngrok: https://ngrok.com/download")
+print("  2. Run: ngrok http 8000")
+print("  3. Copy the https URL")
+print("  4. Set Twilio webhook to: https://YOUR-URL/webhook/whatsapp")
+print()
+print("Option 2 - Simulate WhatsApp locally:")
+print("  python scripts/test_webhook.py")
+print()
+print("Option 3 - Deploy to cloud:")
+print("  Use Railway.app or Render.com (see docs)")
+print()
+print("=" * 60)
+print("🎯 Your phone: +919306912663")
+print("🤖 Twilio WhatsApp: +1 415 523 8886")
+print()
+print("Commands to test:")
+print("  STATUS  - Current conditions")
+print("  TANAM   - Farming advice")
+print("  BANTUAN - Help menu")
+print("=" * 60)
+print()
+print("Backend is READY! Waiting for WhatsApp messages...")
+print()

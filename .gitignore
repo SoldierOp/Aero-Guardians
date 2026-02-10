@@ -51,6 +51,16 @@ Thumbs.db
 *.pdf
 reports/
 
+# Documentation (private)
+docs/
+
+# Environment Variables
+.env
+
+# Ngrok
+ngrok.exe
+ngrok.zip
+
 # Windows Batch Files (if they contain sensitive info)
 # start_backend.bat
 # start_dashboard.bat
