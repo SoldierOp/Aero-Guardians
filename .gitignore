@@ -51,16 +51,41 @@ Thumbs.db
 *.pdf
 reports/
 
-# Documentation (private)
-docs/
-
 # Environment Variables
 .env
 
 # Ngrok
 ngrok.exe
 ngrok.zip
+download_ngrok.ps1
+get_ngrok.ps1
+NGROK_SETUP.md
 
-# Windows Batch Files (if they contain sensitive info)
-# start_backend.bat
-# start_dashboard.bat
+# Personal reference files
+SENSOR_STATUS_FINAL.md
+SENSOR_TESTING_SUMMARY.md
+SENSOR_TEST_GUIDE.md
+SYSTEM_COMPLETE.md
+INTEGRATION_GUIDE.md
+PITCH_QUICK_GUIDE.md
+PRESENTATION_COMPLETE.md
+test_backend_connection.py
+README_OLD_BACKUP.md
+QUICK_GITHUB_UPLOAD.md
+
+# Windows Batch Files (personal convenience)
+start_backend.bat
+start_dashboard.bat
+START_PEATGUARD.bat
+
+# Documentation (private reference/strategy)
+docs/BRUTAL_GAP_ANALYSIS.md
+docs/CRITICAL_FIXES_4DAYS.md
+docs/CHATBOT_IMPLEMENTATION_COMPLETE.md
+docs/FINAL_SOFTWARE_STATUS.md
+docs/SOFTWARE_READY_STATUS.md
+docs/strategy/
+
+# Test/Debug Arduino files
+test_connected_sensors/test_*.ino
+test_connected_sensors/test_connected_sensors.ino
