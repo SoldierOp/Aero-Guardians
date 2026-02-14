@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: peatguard_db
+    environment:
+      POSTGRES_DB: peatguard
+      POSTGRES_USER: peatguard_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - peatguard_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U peatguard_user -d peatguard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: peatguard_backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://peatguard_user:${DB_PASSWORD:-changeme123}@postgres:5432/peatguard
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_WHATSAPP_FROM: ${TWILIO_WHATSAPP_FROM}
+      ALERT_PHONE_NUMBERS: ${ALERT_PHONE_NUMBERS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - peatguard_network
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+
+  # Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: peatguard_dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      BACKEND_URL: http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - peatguard_network
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: peatguard_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./website:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+      - dashboard
+    networks:
+      - peatguard_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  peatguard_network:
+    driver: bridge
