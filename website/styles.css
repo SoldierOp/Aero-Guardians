@@ -62,7 +62,13 @@ body {
 }
 
 .logo {
-    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    transition: transform 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.1);
 }
 
 .nav-menu {
@@ -569,6 +575,11 @@ body {
     gap: 1rem;
 }
 
+.footer-logo {
+    width: 60px;
+    height: 60px;
+}
+
 .footer-brand .brand-name {
     font-size: 1.5rem;
     font-weight: bold;
@@ -655,7 +666,3 @@ body {
         font-size: 2rem;
     }
     
-    .section-title {
-        font-size: 2rem;
-    }
-}

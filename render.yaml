@@ -1,0 +1,77 @@
+# Render.com Blueprint Configuration
+# This file defines all services needed for PeatGuard Pro
+
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: peatguard-db
+    env: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile.postgres
+    envVars:
+      - key: POSTGRES_DB
+        value: peatguard_db
+      - key: POSTGRES_USER
+        value: peatguard_admin
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+    disk:
+      name: peatguard-db-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1
+
+  # Backend API
+  - type: web
+    name: peatguard-backend
+    env: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile.backend
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: peatguard-db
+          property: connectionString
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_WHATSAPP_NUMBER
+        value: whatsapp:+14155238886
+      - key: ALERT_WHATSAPP_NUMBER
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+      - key: ALLOWED_ORIGINS
+        value: https://peatguard.live,https://peatguard-dashboard.onrender.com
+
+  # Dashboard (Streamlit)
+  - type: web
+    name: peatguard-dashboard
+    env: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile.dashboard
+    envVars:
+      - key: BACKEND_URL
+        fromService:
+          name: peatguard-backend
+          type: web
+          property: host
+
+  # Static Site (Landing Page)
+  - type: web
+    name: peatguard-web
+    env: static
+    plan: free
+    region: singapore
+    buildCommand: echo "No build needed"
+    staticPublishPath: ./website
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
